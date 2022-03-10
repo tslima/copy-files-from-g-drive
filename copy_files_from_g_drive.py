@@ -11,6 +11,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseDownload
 import concurrent.futures
+import zipfile
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -116,6 +117,10 @@ def save_file(service, path, item):
         while done is False:
             status, done = downloader.next_chunk()
             print("Download %s:  %d%%." % (name,int(status.progress() * 100)))
+        if '.zip' in name:
+            print(f'Unzinping file: {name}')
+            with zipfile.ZipFile(name, 'r') as zip_ref:
+                zip_ref.extractall(os.path.splitext(name)[0])
         return {'status':'OK', 'file': name}  
     except:
         return {'status':'FAIL', 'file': name}  
